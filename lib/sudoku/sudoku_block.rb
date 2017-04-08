@@ -48,8 +48,12 @@ module Sudoku
       end
 
       possible_solutions.each_pair do |cell_nr, poss_solutions|
-        SudokuBlock.send(type: :definite, cell: cell_nr, value: poss_solutions.first) if poss_solutions&.length==1
+        Sudoku.send_msg(type: :definite, cell: cell_nr, value: poss_solutions.first) if poss_solutions&.length==1
       end
+    end
+
+    def solved?
+      @still_to_place.empty?
     end
   end
 end
