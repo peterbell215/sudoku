@@ -9,5 +9,8 @@ module Sudoku
     end
 
     attr_reader :nr
+    attr_accessor :definite
+    attr_accessor :cannot_be
+    attr_accessor :guesses
   end
 end
