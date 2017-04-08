@@ -30,6 +30,23 @@ module Sudoku
 
     # msg: {type: <:definite, :guess, :unguess, :contradiction>, field: 13, value: 6}
 
+    def receive_msg(msg)
+      case msg[:type]
+        when :definite
+          set_definite(msg[:cell], msg[:value])
+        when :infer_definites
+          infer_definites
+        else
+          fail
+      end
+    end
+
+    def solved?
+      @still_to_place.empty?
+    end
+
+    private
+
     def set_definite(cell_nr, value)
       if @cells[cell_nr]
         @cells[cell_nr].definite = value
@@ -50,10 +67,6 @@ module Sudoku
       possible_solutions.each_pair do |cell_nr, poss_solutions|
         Sudoku.send_msg(type: :definite, cell: cell_nr, value: poss_solutions.first) if poss_solutions&.length==1
       end
-    end
-
-    def solved?
-      @still_to_place.empty?
     end
   end
 end

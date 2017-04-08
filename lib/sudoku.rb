@@ -18,33 +18,33 @@ module Sudoku
 
   # Keep picking off until we are done
   def Sudoku.phase1
-    until @blocks.all? { |block| block.solved? }
+    until Sudoku.solved? || @msg_queue.empty?
       until @msg_queue.empty?
         msg = @msg_queue.pop
 
         case msg[:type]
         when :definite
-          @blocks.each { |block| block.set_definite( msg[:cell], msg[:value]) }
+          @blocks.each { |block| block.receive_msg( msg ) }
         else
           fail
         end
       end
 
-      puts Sudoku.pretty_print
-
       # check if we can infer something new
-      @blocks.each { |block| block.infer_definites }
-
-      # if asking to infer has not added new messages, we can't infer any more but need to start guessing.
-      return false if @msg_queue.empty?
+      @blocks.each { |block| block.receive_msg( type: :infer_definites ) }
     end
-    return true
+
+    return Sudoku.solved?
   end
 
   # Every message goes to every queue
   def Sudoku.send_msg( msg )
     @msg_queue ||= []
     @msg_queue << msg
+  end
+
+  def Sudoku.solved?
+    @blocks.all?( &:solved? )
   end
 
   def Sudoku.pretty_print
@@ -57,3 +57,15 @@ module Sudoku
     end + "\n"
   end
 end
+
+Sudoku.run( 0 => 5, 1 => 3, 4=> 7,
+             9 => 6, 12 => 1, 13 => 9, 14 => 5,
+             19 => 9, 20 => 8, 25 => 6,
+             27 => 8, 31 => 6, 35 => 3,
+             36 => 4, 39 => 8, 41 => 3, 44 => 1,
+             45 => 7, 49 => 2, 53 => 6,
+             55 => 6, 60 => 2, 61 => 8,
+             66 => 4, 67 => 1, 68 => 9, 71 => 5,
+             76 => 8, 79 => 7, 80 => 9 )
+
+puts Sudoku.pretty_print

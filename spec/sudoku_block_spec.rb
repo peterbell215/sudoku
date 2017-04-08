@@ -46,7 +46,7 @@ RSpec.describe Sudoku::SudokuBlock do
     subject { Sudoku::SudokuBlock.new(0) }
 
     it 'should take account of a cell in the block being set' do
-      subject.set_definite(10, 1)
+      subject.receive_msg( type: :definite, cell: 10, value: 1)
 
       subject.cells.each_pair do |nr, cell|
         expect( cell.cannot_be ).to match_array(1 ) unless nr==10
@@ -54,7 +54,7 @@ RSpec.describe Sudoku::SudokuBlock do
     end
 
     it 'should take account of a cell in the same row in a neighboring block being set' do
-      subject.set_definite(5, 1)
+      subject.receive_msg( type: :definite, cell: 5, value: 1)
 
       (0..2).each { |cell_nr| expect( subject.cells[cell_nr].cannot_be ).to match_array( 1 ) }
       (9..11).each { |cell_nr| expect( subject.cells[cell_nr].cannot_be ).to be_empty }
@@ -62,7 +62,7 @@ RSpec.describe Sudoku::SudokuBlock do
     end
 
     it 'should take account of a cell in the same column in a neighboring block being set' do
-      subject.set_definite(36, 1)
+      subject.receive_msg(type: :definite, cell: 36, value: 1)
 
       (0..18).step(9).each { |cell_nr| expect( subject.cells[cell_nr].cannot_be ).to match_array( 1 ) }
       (1..19).step(9).each { |cell_nr| expect( subject.cells[cell_nr].cannot_be ).to be_empty }
@@ -74,10 +74,13 @@ RSpec.describe Sudoku::SudokuBlock do
     subject { Sudoku::SudokuBlock.new(4) }
 
     it 'should identify definite solutions' do
-      expect( Sudoku::SudokuBlock ).to receive(:send).with(type: :definite, cell: 40, value: 5)
+      pending
 
-      problem.each_pair { |cell, value| subject.set_definite(cell, value) }
-      subject.infer_definites
+      expect( Sudoku::SudokuBlock ).to receive(:send_msg).with(type: :definite, cell: 40, value: 5)
+
+      problem.each_pair { |cell, value| subject.receive_msg(type: :definite, cell: cell, value: value) }
+
+      subject.receive_msg(type: :infer_definites)
     end
   end
 end

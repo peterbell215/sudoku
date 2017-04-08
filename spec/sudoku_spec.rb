@@ -19,6 +19,6 @@ RSpec.describe Sudoku do
   end
 
   it 'solves the problem' do
-    expect( Sudoku.run(problem) ).to be_true
+    expect( Sudoku.run(problem) ).to be_truthy
   end
 end
